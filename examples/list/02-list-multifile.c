@@ -11,7 +11,7 @@
 #define COLLECTIONS_IMPORT_LIST_IMPLEMENTATION
 
 // Implicitly 'import's list
-#include "02-list.h"
+#include "02-list-multifile.h"
 
 int main(void) {
     Weights ws = {0};
