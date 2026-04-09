@@ -1,4 +1,4 @@
-.PHONY:
+.PHONY: all
 all: build/01-list build/02-list build/03-list
 
 build/01-list: examples/list/01-list.c
