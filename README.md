@@ -20,6 +20,8 @@ You can also pick and choose which implementations to include for which module:
 // while for OTHERMODULE, only the declarations will be included.
 ```
 
+The repo contains examples for each module inside the [examples folder](./examples). You can use the provided [Makefile](Makefile) to compile each example. Build artifacts are placed inside a `build` folder at the root of the repository (created if it doesn't exist).
+
 Here is an overview of each module:
 
 ### List
