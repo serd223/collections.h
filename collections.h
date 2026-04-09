@@ -4,9 +4,13 @@
 #ifndef ___COLLECTIONS_LIST_HEADER
 #define ___COLLECTIONS_LIST_HEADER
 
-#ifndef ___COLLECTIONS_LIST_ASSERT
-#define ___COLLECTIONS_LIST_ASSERT assert
-#endif // ___COLLECTIONS_LIST_ASSERT
+#ifndef _COLLECTIONS_LIST_ASSERT
+    #ifdef _COLLECTIONS_ASSERT
+        #define _COLLECTIONS_LIST_ASSERT _COLLECTIONS_ASSERT
+    #else
+        #define _COLLECTIONS_LIST_ASSERT assert
+    #endif // _COLLECTIONS_ASSERT
+#endif // _COLLECTIONS_LIST_ASSERT
 
 #define List(ty) ___List_##ty
 
@@ -31,7 +35,7 @@ do {\
     (list)->data[(list)->len++] = (val);\
 } while(0)
 
-#define list_pop(list) (___COLLECTIONS_LIST_ASSERT((list)->len > 0), (list)->data[--(list)->len])
+#define list_pop(list) (_COLLECTIONS_LIST_ASSERT((list)->len > 0), (list)->data[--(list)->len])
 
 // NOTE: Should list_dbg print a newline or no?
 #define LIST_FMT_ARG(x) x
