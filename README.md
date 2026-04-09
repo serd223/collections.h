@@ -30,6 +30,8 @@ Implements a generic and easy to use dynamic array/list/vector/whatever your lan
   #include <stdio.h>
   #include <collections.h>
 
+  // Different ways to define a List compatible type
+  // All are equivalent to the macros in this module
   TYPEDEF_NAMED_LIST(int);
   TYPEDEF_LIST(int, Numbers);
   typedef struct {
