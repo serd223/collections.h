@@ -30,6 +30,8 @@ Implements a generic and easy to use dynamic array/list/vector/whatever your lan
 (Truncated from [examples/list/01-list.c](examples/list/01-list.c))
 ```c
   #include <stdio.h>
+
+  #define COLLECTIONS_IMPORT_LIST
   #include <collections.h>
 
   // Different ways to define a List compatible type
