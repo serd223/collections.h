@@ -139,7 +139,7 @@ do {\
     if ((list)->len <= 0) break;\
     printf("{");\
     printf(fmt, fmt_arg((list)->data[0]));\
-    for (size_t i = 1; i < (list)->len; i++) {\
+    for (___COLLECTIONS_LIST_SIZE_T i = 1; i < (list)->len; i++) {\
         printf(", " fmt, fmt_arg((list)->data[i]));\
     }\
     printf("}\n");\
