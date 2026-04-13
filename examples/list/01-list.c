@@ -10,7 +10,9 @@
 #include "../../collections.h"
 
 // This automatically `typedef`s a list type called `List(int)`
-TYPEDEF_NAMED_LIST(int);
+// Most primitives have predefined List(...) style types.
+// (Can be disabled with COLLECTIONS_LIST_DONT_TYPEDEF_PRIMITIVES)
+// TYPEDEF_NAMED_LIST(int);
 
 // If you still want to choose the type name but want the
 // definition to be shorter
