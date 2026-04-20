@@ -9,6 +9,13 @@
  * - _COLLECTIONS_LIST_ASSERT: Customize assert macro used for this module, defaults to `_COLLECTIONS_ASSERT` if it is available and `assert` if it is not.
  * - COLLECTIONS_LIST_DONT_TYPEDEF_PRIMITIVES: Disables the predefinition of List(...) style types from primitives if defined.
 */
+/**
+ * @defgroup list List Module
+ * @brief List Module Documentation
+ *
+ * @addtogroup list
+ * @{
+*/
 #ifdef COLLECTIONS_IMPORT_LIST
 
 #ifndef ___COLLECTIONS_LIST_HEADER
@@ -29,18 +36,22 @@
 #define ___COLLECTIONS_LIST_SIZE_T size_t
 #endif // __SIZE_TYPE__
 
+/** @brief Refers to a List of type `ty` defined by @link TYPEDEF_NAMED_LIST `TYPEDEF_NAMED_LIST`@endlink */
 #define List(ty) ___COLLECTIONS_LIST_TYPE_PREFIX_##ty
 
+/** @brief Helper macro that add necessary list fields of type `ty` to your struct so it can interact with list macros */
 #define LIST_FIELDS(ty)\
 ty* data;\
 ___COLLECTIONS_LIST_SIZE_T len;\
 ___COLLECTIONS_LIST_SIZE_T cap
 
+/** @brief typedefines a List type of type `ty` with the supplied name */
 #define TYPEDEF_LIST(ty, list_ty_name)\
 typedef struct {\
     LIST_FIELDS(ty);\
 } list_ty_name
 
+/** @brief typedefines a List type of type `ty` that can be referred to with the @link List `List`@endlink macro*/
 #define TYPEDEF_NAMED_LIST(ty) TYPEDEF_LIST(ty, List(ty))
 
 #ifndef COLLECTIONS_LIST_DONT_TYPEDEF_PRIMITIVES
@@ -121,6 +132,12 @@ ___COLLECTIONS_LIST_DEFINE_CUSTOM_PRIMITIVE(__PTRDIFF_TYPE__, ptrdiff_t);
 
 #endif // COLLECTIONS_LIST_DONT_TYPEDEF_PRIMITIVES
 
+/**
+ * @brief Appends `val` to the supplied `list`
+ *
+ * @param list Pointer to a valid List type
+ * @param val Value that matches the type of the supplied `list` argument
+*/
 #define list_append(list, val)\
 do {\
     if ((list)->len >= (list)->cap) {\
@@ -130,10 +147,70 @@ do {\
     (list)->data[(list)->len++] = (val);\
 } while(0)
 
+/**
+ * @brief Appends `val` to the supplied `list`
+ *
+ * @param list Pointer to a valid List type
+ *
+ * @return Returns the last element of `list`. Fails bounds check if `list` is empty.
+*/
 #define list_pop(list) (_COLLECTIONS_LIST_ASSERT((list)->len > 0), (list)->data[--(list)->len])
+
+/**
+ * @brief Copies all elements of `src` to `dst`, completely overwriting `dst`
+ *
+ * @param src Pointer to a valid List type
+ * @param dst Pointer to a valid List type
+*/
+#define list_copy(src, dst)\
+do {\
+    (dst)->len = 0;\
+    for (___COLLECTIONS_LIST_SIZE_T i = 0; i < (src)->len; ++i) {\
+        list_append((dst), (src)->data[i]);\
+    }\
+} while(0)
+
+/**
+ * @brief Helper macro for iterating over Lists
+ *
+ * This macro expands to a for statement that iterates over `list` with an iterator `it` of type `type*`.
+ * So for a `list` of `int`s, the invocation would be like `list_iter(int, n, &list) { *n = 5; }`.
+ *
+ * @param type The type that the `list` List is referring to
+ * @param it The name that will be used for the iterator variable
+ * @param list Pointer to a valid List type
+*/
+#define list_iter(type, it, list) for (type* it = (list)->data; it < (list)->data + (list)->len; ++it)
+
+/**
+ * @brief Uses @link list_iter `list_iter`@endlink to apply the supplied `fn` to each element of `list`
+ *
+ * @param type The type that the `list` List is referring to
+ * @param fn Pointer to a function of type `type` (*fn)(`type`)
+ * @param list Pointer to a valid List type
+*/
+#define list_map(type, fn, list) list_iter(type, it, (list)) *it = fn(*it)
+
+/**
+ * @brief Removes the element at index `index` from `list` and shifts remaining elements accordingly
+ *
+ * @param list Pointer to valid List type
+ * @param index Index to be removed
+ *
+ * @return Returns a pointer to the new `index`th element if applicable. Otherwise, returns a pointer to the last element of the list
+*/
+#define list_delete(list, index) (_COLLECTIONS_LIST_ASSERT((index) < (list)->len), (index) == (list)->len - 1 ? (list_pop((list)), (list)->data + (list)->len - 1) : (memmove((list)->data + (index), (list)->data + (index)+ 1, (((list)->len--) - (index) - 1) * sizeof(*(list)->data))))
 
 // NOTE: Should list_dbg print a newline or no?
 #define LIST_FMT_ARG(x) x
+
+/**
+ * @brief Pretty prints the supplied `list` with a newline
+ *
+ * @param list Pointer to vali List type
+ * @param fmt Format specifier to be used for each element of `list` (like "%d" for a List of `int`s)
+ * @param fmt_arg Macro that will be applied to each element while printing for even more configuration (like for user defined 'String View' types). LIST_FMT_ARG can be used as a default.
+*/
 #define list_dbg(list, fmt, fmt_arg)\
 do {\
     if ((list)->len <= 0) break;\
@@ -156,3 +233,4 @@ do {\
 #endif // COLLECTIONS_IMPORT_LIST_IMPLEMENTATION
 
 #endif // COLLECTIONS_IMPORT_LIST
+/** @} */
