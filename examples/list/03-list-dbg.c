@@ -2,8 +2,8 @@
  * 03-list-dbg : Example showcasing advanced usage of `list_dbg` in the List module
 */
 
-#include <stdio.h> // IWYU pragma: keep
-#include <stdlib.h> // IWYU pragma: keep
+#include <stdio.h>
+#include <stdlib.h>
 
 #define COLLECTIONS_IMPORT_LIST
 #include "../../collections.h"
@@ -14,15 +14,13 @@ typedef struct {
     int len;
 } String_View;
 
-TYPEDEF_NAMED_LIST(String_View);
-
 // Special format and format argument specifiers for String_View
-#define SV_FMT "%.*s"
+#define SV_FMT "\"%.*s\""
 #define SV_ARG(sv) (sv).len, (sv).data
 
 int main(void) {
-    const char* message = "Hello, World!";
     List(String_View) views = {0};
+    const char* message = "Hello, World!";
     list_append(&views, ((String_View) {
         .data = message,
         .len = 5
@@ -38,6 +36,6 @@ int main(void) {
         .len = 6
         // "World!"
     }));
-    list_dbg(&views, SV_FMT, SV_ARG);
+    list_dbgn_ext(&views, SV_FMT, SV_ARG);
     return 0;
 }

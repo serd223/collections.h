@@ -11,4 +11,4 @@
 #include <stddef.h>
 #include "../../collections.h"
 
-TYPEDEF_LIST(float, Weights);
+typedef List(float) Weights;

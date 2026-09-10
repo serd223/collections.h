@@ -2,8 +2,8 @@
  * 02-list-multifile : Example showcasing encapsulation while using the List module
 */
 
-#include <stdio.h> // IWYU pragma: keep
-#include <stdlib.h> // IWYU pragma: keep
+#include <stdio.h>
+#include <stdlib.h>
 
 // As headers only import the module, if you wish to use
 // implementation dependent functionality (like non-macro functions)
@@ -20,6 +20,6 @@ int main(void) {
     list_append(&ws, 40.13213);
 
     // Use of custom format specifier
-    list_dbg(&ws, "%.2f", LIST_FMT_ARG);
+    list_dbgn(&ws, "%.2f");
     return 0;
 }
