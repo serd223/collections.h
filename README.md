@@ -32,7 +32,7 @@ For more examples, check out the [List examples folder](examples/list).
 ### StrMap
 Implements a generic and simple HashMap with string keys. Uses linear probing, not very performant but gets the job done.
 
-(Truncated from [examples/list/01-strmap.c](examples/strmap/01-strmap.c))
+(Truncated from [examples/strmap/01-strmap.c](examples/strmap/01-strmap.c))
 ```c
   #include <stdio.h>
   #include <stdlib.h>
@@ -58,7 +58,7 @@ For more examples, check out the [StrMap examples folder](examples/strmap).
 ### StringView
 Implements a simple StringView type and helper functions.
 
-(Truncated from [examples/list/01-string_view.c](examples/string_view/01-string_view.c))
+(Truncated from [examples/string_view/01-string_view.c](examples/string_view/01-string_view.c))
 ```c
   #include <stdio.h>
   #include <string.h>
