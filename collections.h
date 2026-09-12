@@ -44,9 +44,9 @@
 #define _COLLECTIONS_STRCMP strcmp
 #endif // _COLLECTIONS_STRCMP
 
-#ifndef _COLLECTIONS_PRINTF
-#define _COLLECTIONS_PRINTF printf
-#endif // _COLLECTIONS_PRINTF
+#ifndef _COLLECTIONS_FPRINTF
+#define _COLLECTIONS_FPRINTF fprintf
+#endif // _COLLECTIONS_FPRINTF
 
 /**
  * @defgroup list List Module
@@ -74,9 +74,9 @@
 #define _COLLECTIONS_LIST_MEMMOVE _COLLECTIONS_MEMMOVE
 #endif // _COLLECTIONS_LIST_MEMMOVE
 
-#ifndef _COLLECTIONS_LIST_PRINTF
-#define _COLLECTIONS_LIST_PRINTF _COLLECTIONS_PRINTF
-#endif // _COLLECTIONS_LIST_PRINTF
+#ifndef _COLLECTIONS_LIST_FPRINTF
+#define _COLLECTIONS_LIST_FPRINTF _COLLECTIONS_FPRINTF
+#endif // _COLLECTIONS_LIST_FPRINTF
 
 #ifdef __SIZE_TYPE__
 #define ___COLLECTIONS_LIST_SIZE_T __SIZE_TYPE__
@@ -163,16 +163,84 @@ do {\
 #define list_remove(list, index) (_COLLECTIONS_LIST_ASSERT((index) < (list)->len), (index) == (list)->len - 1 ? (list_pop((list)), (list)->data + (list)->len - 1) : (_COLLECTIONS_LIST_MEMMOVE((list)->data + (index), (list)->data + (index)+ 1, (((list)->len--) - (index) - 1) * sizeof(*(list)->data))))
 
 /**
+ * @brief Pretty prints the supplied `list` into `file`
+ * @fn list_fdbg(file, list, fmt)
+ *
+ * @param file FILE* to print into
+ * @param %list Pointer to valid List type
+ * @param fmt Format specifier to be used for each element of `list` (like "%d" for a List of `int`s)
+*/
+#define list_fdbg(file, list, fmt)\
+do {\
+    list_fdbg_ext((file), (list), fmt, ___COLLECTIONS_H_DEFAULT_FMT_ARG);\
+} while(0)
+
+/**
+ * @brief Pretty prints the supplied `list` into `file`
+ * @fn list_fdbg_ext(file, list, fmt, fmt_arg)
+ *
+ * @param file FILE* to print into
+ * @param %list Pointer to valid List type
+ * @param fmt Format specifier to be used for each element of `list` (like "%d" for a List of `int`s)
+ * @param fmt_arg Macro that will be applied to each element while printing for even more configuration (like for user defined 'String View' types). LIST_FMT_ARG can be used as a default.
+*/
+#define list_fdbg_ext(file, list, fmt, fmt_arg)\
+do {\
+    if ((list)->len <= 0) break;\
+    _COLLECTIONS_LIST_FPRINTF((file), "{");\
+    _COLLECTIONS_LIST_FPRINTF((file), fmt, fmt_arg((list)->data[0]));\
+    for (___COLLECTIONS_LIST_SIZE_T i = 1; i < (list)->len; i++) {\
+        _COLLECTIONS_LIST_FPRINTF((file), ", " fmt, fmt_arg((list)->data[i]));\
+    }\
+    _COLLECTIONS_LIST_FPRINTF((file), "}");\
+} while(0)
+
+/**
+ * @brief Pretty prints the supplied `list` with a newline into `file`
+ * @fn list_fdbgn(file, list, fmt)
+ *
+ * @param file FILE* to print into
+ * @param %list Pointer to valid List type
+ * @param fmt Format specifier to be used for each element of `list` (like "%d" for a List of `int`s)
+*/
+#define list_fdbgn(file, list, fmt)\
+do {\
+    list_fdbg((file), (list), fmt);\
+    _COLLECTIONS_LIST_FPRINTF((file), "\n");\
+} while(0)
+
+/**
+ * @brief Pretty prints the supplied `list` with a newline into `file`
+ * @fn list_fdbgn_ext(file, list, fmt, fmt_arg)
+ *
+ * @param file FILE* to print into
+ * @param %list Pointer to valid List type
+ * @param fmt Format specifier to be used for each element of `list` (like "%d" for a List of `int`s)
+ * @param fmt_arg Macro that will be applied to each element while printing for even more configuration (like for user defined 'String View' types). LIST_FMT_ARG can be used as a default.
+*/
+#define list_fdbgn_ext(file, list, fmt, fmt_arg)\
+do {\
+    list_fdbg_ext((file), (list), fmt, fmt_arg);\
+    _COLLECTIONS_LIST_FPRINTF((file), "\n");\
+} while(0)
+
+/**
  * @brief Pretty prints the supplied `list`
- * @fn list_dbg(list, fmt, fmt_arg)
+ * @fn list_dbg(list, fmt)
  *
  * @param %list Pointer to valid List type
  * @param fmt Format specifier to be used for each element of `list` (like "%d" for a List of `int`s)
 */
-#define list_dbg(list, fmt)\
-do {\
-    list_dbg_ext((list), fmt, ___COLLECTIONS_H_DEFAULT_FMT_ARG);\
-} while(0)
+#define list_dbg(list, fmt) list_fdbg(stdout, (list), fmt)
+
+/**
+ * @brief Pretty prints the supplied `list` with a newline
+ * @fn list_dbgn(list, fmt)
+ *
+ * @param %list Pointer to valid List type
+ * @param fmt Format specifier to be used for each element of `list` (like "%d" for a List of `int`s)
+*/
+#define list_dbgn(list, fmt) list_fdbgn(stdout, (list), fmt)
 
 /**
  * @brief Pretty prints the supplied `list`
@@ -182,29 +250,7 @@ do {\
  * @param fmt Format specifier to be used for each element of `list` (like "%d" for a List of `int`s)
  * @param fmt_arg Macro that will be applied to each element while printing for even more configuration (like for user defined 'String View' types). LIST_FMT_ARG can be used as a default.
 */
-#define list_dbg_ext(list, fmt, fmt_arg)\
-do {\
-    if ((list)->len <= 0) break;\
-    _COLLECTIONS_LIST_PRINTF("{");\
-    _COLLECTIONS_LIST_PRINTF(fmt, fmt_arg((list)->data[0]));\
-    for (___COLLECTIONS_LIST_SIZE_T i = 1; i < (list)->len; i++) {\
-        _COLLECTIONS_LIST_PRINTF(", " fmt, fmt_arg((list)->data[i]));\
-    }\
-    _COLLECTIONS_LIST_PRINTF("}");\
-} while(0)
-
-/**
- * @brief Pretty prints the supplied `list` with a newline
- * @fn list_dbgn(list, fmt, fmt_arg)
- *
- * @param %list Pointer to valid List type
- * @param fmt Format specifier to be used for each element of `list` (like "%d" for a List of `int`s)
-*/
-#define list_dbgn(list, fmt)\
-do {\
-    list_dbg((list), fmt);\
-    _COLLECTIONS_LIST_PRINTF("\n");\
-} while(0)
+#define list_dbg_ext(list, fmt, fmt_arg) list_fdbg_ext(stdout, (list), fmt, fmt_arg)
 
 /**
  * @brief Pretty prints the supplied `list` with a newline
@@ -214,11 +260,7 @@ do {\
  * @param fmt Format specifier to be used for each element of `list` (like "%d" for a List of `int`s)
  * @param fmt_arg Macro that will be applied to each element while printing for even more configuration (like for user defined 'String View' types). LIST_FMT_ARG can be used as a default.
 */
-#define list_dbgn_ext(list, fmt, fmt_arg)\
-do {\
-    list_dbg_ext((list), fmt, fmt_arg);\
-    _COLLECTIONS_LIST_PRINTF("\n");\
-} while(0)
+#define list_dbgn_ext(list, fmt, fmt_arg) list_fdbgn_ext(stdout, (list), fmt, fmt_arg)
 
 #endif // ___COLLECTIONS_LIST_HEADER
 
@@ -263,9 +305,9 @@ do {\
 #define _COLLECTIONS_STRMAP_STRCMP _COLLECTIONS_STRCMP
 #endif // _COLLECTIONS_STRMAP_STRCMP
 
-#ifndef _COLLECTIONS_STRMAP_PRINTF
-#define _COLLECTIONS_STRMAP_PRINTF _COLLECTIONS_PRINTF
-#endif // _COLLECTIONS_STRMAP_PRINTF
+#ifndef _COLLECTIONS_STRMAP_FPRINTF
+#define _COLLECTIONS_STRMAP_FPRINTF _COLLECTIONS_FPRINTF
+#endif // _COLLECTIONS_STRMAP_FPRINTF
 
 #ifdef __SIZE_TYPE__
 #define ___COLLECTIONS_STRMAP_SIZE_T __SIZE_TYPE__
@@ -310,25 +352,29 @@ do {\
     _COLLECTIONS_STRMAP_FREE((map)->data);\
 } while(0)
 
-#define strmap_dbg(map, fmt_data) strmap_dbg_ext((map), "\"%s\"", fmt_data, ___COLLECTIONS_H_DEFAULT_FMT_ARG, ___COLLECTIONS_H_DEFAULT_FMT_ARG)
+#define strmap_fdbg(file, map, fmt_data) strmap_fdbg_ext((file), (map), "\"%s\"", fmt_data, ___COLLECTIONS_H_DEFAULT_FMT_ARG, ___COLLECTIONS_H_DEFAULT_FMT_ARG)
 
-#define strmap_dbg_ext(map, fmt_key, fmt_data, fmt_key_arg, fmt_data_arg)\
+#define strmap_fdbg_ext(file, map, fmt_key, fmt_data, fmt_key_arg, fmt_data_arg)\
 do {\
-    _COLLECTIONS_STRMAP_PRINTF("{\n");\
+    _COLLECTIONS_STRMAP_FPRINTF((file), "{\n");\
     if ((map)->len <= 0) {\
-        _COLLECTIONS_STRMAP_PRINTF("}\n");\
+        _COLLECTIONS_STRMAP_FPRINTF((file), "}\n");\
         break;\
     }\
     ___COLLECTIONS_STRMAP_SIZE_T found = 0;\
     for (___COLLECTIONS_STRMAP_SIZE_T i = 0; i < (map)->cap; i++) {\
         if ((map)->keys[i].key != NULL && (map)->keys[i].marker == 1) {\
             found++;\
-            _COLLECTIONS_STRMAP_PRINTF("    "fmt_key": "fmt_data",\n", fmt_key_arg((map)->keys[i].key), fmt_data_arg((map)->data[i]));\
+            _COLLECTIONS_STRMAP_FPRINTF((file), "    "fmt_key": "fmt_data",\n", fmt_key_arg((map)->keys[i].key), fmt_data_arg((map)->data[i]));\
         }\
         if (found >= (map)->len) break;\
     }\
-    _COLLECTIONS_STRMAP_PRINTF("}\n");\
+    _COLLECTIONS_STRMAP_FPRINTF((file), "}\n");\
 } while(0)
+
+#define strmap_dbg(map, fmt_data) strmap_fdbg(stdout, (map), fmt_data)
+
+#define strmap_dbg_ext(map, fmt_key, fmt_data, fmt_key_arg, fmt_data_arg) strmap_fdbg_ext(stdout, (map), fmt_key, fmt_data, fmt_key_arg, fmt_data_arg)
 
 #define strmap_iter(map, key_iter, val_iter, ...)\
 do {\

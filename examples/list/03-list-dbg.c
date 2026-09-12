@@ -37,5 +37,6 @@ int main(void) {
         // "World!"
     }));
     list_dbgn_ext(&views, SV_FMT, SV_ARG);
+    list_fdbgn_ext(stderr, &views, SV_FMT, SV_ARG);
     return 0;
 }

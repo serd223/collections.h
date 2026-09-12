@@ -19,6 +19,7 @@ int main(void) {
     strmap_put(&weights, "d", 4.0);
 
     strmap_dbg(&weights, "%f");
+    strmap_fdbg(stderr, &weights, "%f");
 
     float item;
     if (strmap_remove(&weights, "d", &item)) {
