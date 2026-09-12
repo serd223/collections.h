@@ -623,6 +623,9 @@ typedef struct {
     .len = (sv).len - (n)\
 })
 
+_COLLECTIONS_STRING_VIEW_APIDEF int sv_ncmp(StringView a, StringView b, _COLLECTIONS_STRING_VIEW_SIZE_T n);
+#define sv_cmp(a, b) sv_ncmp((a), (b), (a).len < (b).len ? (a).len : (b).len)
+
 #define sv_trim_matches(sv, matches) sv_trim_end_matches(sv_trim_start_matches((sv), (matches)).right, (matches)).left
 _COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_start_matches(StringView sv, int (*matches)(int));
 _COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_end_matches(StringView sv, int (*matches)(int));
@@ -669,6 +672,16 @@ _COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_end_untilc(StringView sv,
 #ifdef COLLECTIONS_IMPORT_STRING_VIEW_IMPLEMENTATION
 #ifndef ___COLLECTIONS_STRING_VIEW_IMPLEMENTATION
 #define ___COLLECTIONS_STRING_VIEW_IMPLEMENTATION
+
+_COLLECTIONS_STRING_VIEW_APIDEF int sv_ncmp(StringView a, StringView b, _COLLECTIONS_STRING_VIEW_SIZE_T n) {
+    n = n > a.len ? a.len : n;
+    n = n > b.len ? b.len : n;
+    int diff = 0;
+    for (_COLLECTIONS_STRING_VIEW_SIZE_T i = 0; i < n; i++) {
+        diff += (int)(a.data[i]) - (int)(b.data[i]);
+    }
+    return diff;
+}
 
 _COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_start_matches(StringView sv, int (*matches)(int)) {
     if (sv.len == 0) return (StringViewPair) { .l = sv, .r = sv };
