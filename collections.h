@@ -2,18 +2,6 @@
     The main source file of collections.h.
 */
 
-/*
- * Global Config Macros:
- * - _COLLECTIONS_ASSERT: Customize assert macro globally, can be overwritten per-module. Defaults are managed by modules.
-*/
-
-/*
- * List Module
- * Config Macros:
- * - _COLLECTIONS_LIST_ASSERT: Customize assert macro used for this module, defaults to `_COLLECTIONS_ASSERT` if it is available and `assert` if it is not.
-*/
-
-
 #ifndef ___COLLECTIONS_H_DEFAULT_FMT_ARG
 #define ___COLLECTIONS_H_DEFAULT_FMT_ARG(x) (x)
 #endif // ___COLLECTIONS_H_DEFAULT_FMT_ARG
@@ -27,6 +15,38 @@
 #define COLLECTIONS_IMPORT_LIST_IMPLEMENTATION
 #define COLLECTIONS_IMPORT_STRMAP_IMPLEMENTATION
 #endif // COLLECTIONS_IMPORT_IMPLEMENTATION
+
+#ifndef _COLLECTIONS_ASSERT
+#define _COLLECTIONS_ASSERT assert
+#endif // _COLLECTIONS_ASSERT
+
+#ifndef _COLLECTIONS_REALLOC
+#define _COLLECTIONS_REALLOC realloc
+#endif // _COLLECTIONS_REALLOC
+
+#ifndef _COLLECTIONS_FREE
+#define _COLLECTIONS_FREE free
+#endif // _COLLECTIONS_FREE
+
+#ifndef _COLLECTIONS_MEMMOVE
+#define _COLLECTIONS_MEMMOVE memmove
+#endif // _COLLECTIONS_MEMMOVE
+
+#ifndef _COLLECTIONS_MEMCPY
+#define _COLLECTIONS_MEMCPY memcpy
+#endif // _COLLECTIONS_MEMCPY
+
+#ifndef _COLLECTIONS_STRDUP
+#define _COLLECTIONS_STRDUP strdup
+#endif // _COLLECTIONS_STRDUP
+
+#ifndef _COLLECTIONS_STRCMP
+#define _COLLECTIONS_STRCMP strcmp
+#endif // _COLLECTIONS_STRCMP
+
+#ifndef _COLLECTIONS_PRINTF
+#define _COLLECTIONS_PRINTF printf
+#endif // _COLLECTIONS_PRINTF
 
 /**
  * @defgroup list List Module
@@ -43,12 +63,20 @@
 
 /** @cond */
 #ifndef _COLLECTIONS_LIST_ASSERT
-    #ifdef _COLLECTIONS_ASSERT
-        #define _COLLECTIONS_LIST_ASSERT _COLLECTIONS_ASSERT
-    #else
-        #define _COLLECTIONS_LIST_ASSERT assert
-    #endif // _COLLECTIONS_ASSERT
+#define _COLLECTIONS_LIST_ASSERT _COLLECTIONS_ASSERT
 #endif // _COLLECTIONS_LIST_ASSERT
+
+#ifndef _COLLECTIONS_LIST_REALLOC
+#define _COLLECTIONS_LIST_REALLOC _COLLECTIONS_REALLOC
+#endif // _COLLECTIONS_LIST_REALLOC
+
+#ifndef _COLLECTIONS_LIST_MEMMOVE
+#define _COLLECTIONS_LIST_MEMMOVE _COLLECTIONS_MEMMOVE
+#endif // _COLLECTIONS_LIST_MEMMOVE
+
+#ifndef _COLLECTIONS_LIST_PRINTF
+#define _COLLECTIONS_LIST_PRINTF _COLLECTIONS_PRINTF
+#endif // _COLLECTIONS_LIST_PRINTF
 
 #ifdef __SIZE_TYPE__
 #define ___COLLECTIONS_LIST_SIZE_T __SIZE_TYPE__
@@ -81,7 +109,7 @@ struct {\
 do {\
     if ((list)->len >= (list)->cap) {\
         (list)->cap = (list)->cap > 0 ? (list)->cap * 2 : 16 * sizeof(*(list)->data);\
-        (list)->data = realloc((list)->data, (list)->cap);\
+        (list)->data = _COLLECTIONS_LIST_REALLOC((list)->data, (list)->cap);\
     }\
     (list)->data[(list)->len++] = (val);\
 } while(0)
@@ -132,7 +160,7 @@ do {\
  *
  * @return Returns a pointer to the new `index`th element if applicable. Otherwise, returns a pointer to the last element of the list
 */
-#define list_remove(list, index) (_COLLECTIONS_LIST_ASSERT((index) < (list)->len), (index) == (list)->len - 1 ? (list_pop((list)), (list)->data + (list)->len - 1) : (memmove((list)->data + (index), (list)->data + (index)+ 1, (((list)->len--) - (index) - 1) * sizeof(*(list)->data))))
+#define list_remove(list, index) (_COLLECTIONS_LIST_ASSERT((index) < (list)->len), (index) == (list)->len - 1 ? (list_pop((list)), (list)->data + (list)->len - 1) : (_COLLECTIONS_LIST_MEMMOVE((list)->data + (index), (list)->data + (index)+ 1, (((list)->len--) - (index) - 1) * sizeof(*(list)->data))))
 
 /**
  * @brief Pretty prints the supplied `list`
@@ -157,12 +185,12 @@ do {\
 #define list_dbg_ext(list, fmt, fmt_arg)\
 do {\
     if ((list)->len <= 0) break;\
-    printf("{");\
-    printf(fmt, fmt_arg((list)->data[0]));\
+    _COLLECTIONS_LIST_PRINTF("{");\
+    _COLLECTIONS_LIST_PRINTF(fmt, fmt_arg((list)->data[0]));\
     for (___COLLECTIONS_LIST_SIZE_T i = 1; i < (list)->len; i++) {\
-        printf(", " fmt, fmt_arg((list)->data[i]));\
+        _COLLECTIONS_LIST_PRINTF(", " fmt, fmt_arg((list)->data[i]));\
     }\
-    printf("}");\
+    _COLLECTIONS_LIST_PRINTF("}");\
 } while(0)
 
 /**
@@ -175,7 +203,7 @@ do {\
 #define list_dbgn(list, fmt)\
 do {\
     list_dbg((list), fmt);\
-    printf("\n");\
+    _COLLECTIONS_LIST_PRINTF("\n");\
 } while(0)
 
 /**
@@ -189,7 +217,7 @@ do {\
 #define list_dbgn_ext(list, fmt, fmt_arg)\
 do {\
     list_dbg_ext((list), fmt, fmt_arg);\
-    printf("\n");\
+    _COLLECTIONS_LIST_PRINTF("\n");\
 } while(0)
 
 #endif // ___COLLECTIONS_LIST_HEADER
@@ -212,12 +240,32 @@ do {\
 
 /** @cond */
 #ifndef _COLLECTIONS_STRMAP_ASSERT
-    #ifdef _COLLECTIONS_ASSERT
-        #define _COLLECTIONS_STRMAP_ASSERT _COLLECTIONS_ASSERT
-    #else
-        #define _COLLECTIONS_STRMAP_ASSERT assert
-    #endif // _COLLECTIONS_ASSERT
+#define _COLLECTIONS_STRMAP_ASSERT _COLLECTIONS_ASSERT
 #endif // _COLLECTIONS_STRMAP_ASSERT
+
+#ifndef _COLLECTIONS_STRMAP_REALLOC
+#define _COLLECTIONS_STRMAP_REALLOC _COLLECTIONS_REALLOC
+#endif // _COLLECTIONS_STRMAP_REALLOC
+
+#ifndef _COLLECTIONS_STRMAP_FREE
+#define _COLLECTIONS_STRMAP_FREE _COLLECTIONS_FREE
+#endif // _COLLECTIONS_STRMAP_FREE
+
+#ifndef _COLLECTIONS_STRMAP_MEMCPY
+#define _COLLECTIONS_STRMAP_MEMCPY _COLLECTIONS_MEMCPY
+#endif // _COLLECTIONS_STRMAP_MEMCPY
+
+#ifndef _COLLECTIONS_STRMAP_STRDUP
+#define _COLLECTIONS_STRMAP_STRDUP _COLLECTIONS_STRDUP
+#endif // _COLLECTIONS_STRMAP_STRDUP
+
+#ifndef _COLLECTIONS_STRMAP_STRCMP
+#define _COLLECTIONS_STRMAP_STRCMP _COLLECTIONS_STRCMP
+#endif // _COLLECTIONS_STRMAP_STRCMP
+
+#ifndef _COLLECTIONS_STRMAP_PRINTF
+#define _COLLECTIONS_STRMAP_PRINTF _COLLECTIONS_PRINTF
+#endif // _COLLECTIONS_STRMAP_PRINTF
 
 #ifdef __SIZE_TYPE__
 #define ___COLLECTIONS_STRMAP_SIZE_T __SIZE_TYPE__
@@ -256,30 +304,30 @@ int ___strmap_remove(void* map, const char* key, void* out);
 do {\
     strmap_iter((map), k, v, {\
         (void)v;\
-        free(k);\
+        _COLLECTIONS_STRMAP_FREE(k);\
     });\
-    free((map)->keys);\
-    free((map)->data);\
+    _COLLECTIONS_STRMAP_FREE((map)->keys);\
+    _COLLECTIONS_STRMAP_FREE((map)->data);\
 } while(0)
 
 #define strmap_dbg(map, fmt_data) strmap_dbg_ext((map), "\"%s\"", fmt_data, ___COLLECTIONS_H_DEFAULT_FMT_ARG, ___COLLECTIONS_H_DEFAULT_FMT_ARG)
 
 #define strmap_dbg_ext(map, fmt_key, fmt_data, fmt_key_arg, fmt_data_arg)\
 do {\
-    printf("{\n");\
+    _COLLECTIONS_STRMAP_PRINTF("{\n");\
     if ((map)->len <= 0) {\
-        printf("}\n");\
+        _COLLECTIONS_STRMAP_PRINTF("}\n");\
         break;\
     }\
     ___COLLECTIONS_STRMAP_SIZE_T found = 0;\
     for (___COLLECTIONS_STRMAP_SIZE_T i = 0; i < (map)->cap; i++) {\
         if ((map)->keys[i].key != NULL && (map)->keys[i].marker == 1) {\
             found++;\
-            printf("    "fmt_key": "fmt_data",\n", fmt_key_arg((map)->keys[i].key), fmt_data_arg((map)->data[i]));\
+            _COLLECTIONS_STRMAP_PRINTF("    "fmt_key": "fmt_data",\n", fmt_key_arg((map)->keys[i].key), fmt_data_arg((map)->data[i]));\
         }\
         if (found >= (map)->len) break;\
     }\
-    printf("}\n");\
+    _COLLECTIONS_STRMAP_PRINTF("}\n");\
 } while(0)
 
 #define strmap_iter(map, key_iter, val_iter, ...)\
@@ -329,7 +377,7 @@ unsigned long ___strmap_djb2(const char *str) {
 ___COLLECTIONS_STRMAP_SIZE_T ___strmap_index(struct ___Collections_StrMap_Generic* map, const char* key) {
     ___COLLECTIONS_STRMAP_SIZE_T index = ___strmap_djb2(key) & (map->cap - 1);
     while (index < map->cap) {
-        if (map->keys[index].key != NULL && strcmp(map->keys[index].key, key) == 0) {
+        if (map->keys[index].key != NULL && _COLLECTIONS_STRMAP_STRCMP(map->keys[index].key, key) == 0) {
             return index;
         } else if (map->keys[index].marker == 0)  {
             return index;
@@ -345,14 +393,14 @@ void* ___strmap_put(void* map, const char* key, void* data, ___COLLECTIONS_STRMA
     if ((map_->len + 1) >= map_->cap) {
         if (map_->cap == 0) map_->_data_field_size = data_size;
         map_->cap = map_->cap == 0 ? 16 : map_->cap * 2;
-        map_->data = realloc(map_->data, map_->cap * map_->_data_field_size);
-        map_->keys = realloc(map_->keys, map_->cap * sizeof(*map_->keys));
+        map_->data = _COLLECTIONS_STRMAP_REALLOC(map_->data, map_->cap * map_->_data_field_size);
+        map_->keys = _COLLECTIONS_STRMAP_REALLOC(map_->keys, map_->cap * sizeof(*map_->keys));
     }
     ___COLLECTIONS_STRMAP_SIZE_T index = ___strmap_index(map, key);
     if (index > map_->cap) return NULL;
     char* map_data = (char*)map_->data + map_->_data_field_size * index;
-    memcpy(map_data, data, map_->_data_field_size);
-    map_->keys[index].key = strdup(key);
+    _COLLECTIONS_STRMAP_MEMCPY(map_data, data, map_->_data_field_size);
+    map_->keys[index].key = _COLLECTIONS_STRMAP_STRDUP(key);
     map_->keys[index].marker = 1;
     map_->len++;
 
@@ -379,7 +427,7 @@ int ___strmap_remove(void* map, const char* key, void* out) {
     map_->len--;
     if (out != NULL) {
         char* map_data = (char*)map_->data + map_->_data_field_size * index;
-        memcpy(out, map_data, map_->_data_field_size);
+        _COLLECTIONS_STRMAP_MEMCPY(out, map_data, map_->_data_field_size);
 
     }
     return 1;
