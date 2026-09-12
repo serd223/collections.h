@@ -9,12 +9,29 @@
 #ifdef COLLECTIONS_IMPORT
 #define COLLECTIONS_IMPORT_LIST
 #define COLLECTIONS_IMPORT_STRMAP
+#define COLLECTIONS_IMPORT_STRING_VIEW
 #endif // COLLECTIONS_IMPORT
 
 #ifdef COLLECTIONS_IMPORT_IMPLEMENTATION
 #define COLLECTIONS_IMPORT_LIST_IMPLEMENTATION
 #define COLLECTIONS_IMPORT_STRMAP_IMPLEMENTATION
+#define COLLECTIONS_IMPORT_STRING_VIEW_IMPLEMENTATION
 #endif // COLLECTIONS_IMPORT_IMPLEMENTATION
+
+#ifndef _COLLECTIONS_APIDEF
+#define _COLLECTIONS_APIDEF
+#endif // _COLLECTIONS_APIDEF
+
+#ifndef _COLLECTIONS_SIZE_T
+
+#ifdef __SIZE_TYPE__
+#define _COLLECTIONS_SIZE_T __SIZE_TYPE__
+#else // __SIZE_TYPE__
+// fallback to size_t
+#define _COLLECTIONS_SIZE_T size_t
+#endif // __SIZE_TYPE__
+
+#endif // _COLLECTIONS_SIZE_T
 
 #ifndef _COLLECTIONS_ASSERT
 #define _COLLECTIONS_ASSERT assert
@@ -23,6 +40,10 @@
 #ifndef _COLLECTIONS_REALLOC
 #define _COLLECTIONS_REALLOC realloc
 #endif // _COLLECTIONS_REALLOC
+
+#ifndef _COLLECTIONS_MALLOC
+#define _COLLECTIONS_MALLOC malloc
+#endif // _COLLECTIONS_MALLOC
 
 #ifndef _COLLECTIONS_FREE
 #define _COLLECTIONS_FREE free
@@ -40,9 +61,17 @@
 #define _COLLECTIONS_STRDUP strdup
 #endif // _COLLECTIONS_STRDUP
 
+#ifndef _COLLECTIONS_STRLEN
+#define _COLLECTIONS_STRLEN strlen
+#endif // _COLLECTIONS_STRLEN
+
 #ifndef _COLLECTIONS_STRCMP
 #define _COLLECTIONS_STRCMP strcmp
 #endif // _COLLECTIONS_STRCMP
+
+#ifndef _COLLECTIONS_ISSPACE
+#define _COLLECTIONS_ISSPACE isspace
+#endif // _COLLECTIONS_ISSPACE
 
 #ifndef _COLLECTIONS_FPRINTF
 #define _COLLECTIONS_FPRINTF fprintf
@@ -62,6 +91,10 @@
 #define ___COLLECTIONS_LIST_HEADER
 
 /** @cond */
+#ifndef _COLLECTIONS_LIST_APIDEF
+#define _COLLECTIONS_LIST_APIDEF _COLLECTIONS_APIDEF
+#endif // _COLLECTIONS_LIST_APIDEF
+
 #ifndef _COLLECTIONS_LIST_ASSERT
 #define _COLLECTIONS_LIST_ASSERT _COLLECTIONS_ASSERT
 #endif // _COLLECTIONS_LIST_ASSERT
@@ -78,19 +111,16 @@
 #define _COLLECTIONS_LIST_FPRINTF _COLLECTIONS_FPRINTF
 #endif // _COLLECTIONS_LIST_FPRINTF
 
-#ifdef __SIZE_TYPE__
-#define ___COLLECTIONS_LIST_SIZE_T __SIZE_TYPE__
-#else // __SIZE_TYPE__
-// fallback to size_t
-#define ___COLLECTIONS_LIST_SIZE_T size_t
-#endif // __SIZE_TYPE__
+#ifndef _COLLECTIONS_SIZE_T
+#define _COLLECTIONS_LIST_SIZE_T _COLLECTIONS_SIZE_T
+#endif // _COLLECTIONS_SIZE_T
 /** @endcond */
 
-/** @brief Helper macro that add necessary list fields of type `ty` to your struct so it can interact with list macros */
+/** @brief Helper macro that add necessary list fields of type `ty` to your struct */
 #define LIST_FIELDS(ty)\
 ty* data;\
-___COLLECTIONS_LIST_SIZE_T len;\
-___COLLECTIONS_LIST_SIZE_T cap
+_COLLECTIONS_SIZE_T len;\
+_COLLECTIONS_SIZE_T cap
 
 /** @brief Refers to an anonymus struct for a List of type `ty` */
 #define List(ty)\
@@ -134,7 +164,7 @@ do {\
 #define list_copy(src, dst)\
 do {\
     (dst)->len = 0;\
-    for (___COLLECTIONS_LIST_SIZE_T i = 0; i < (src)->len; ++i) {\
+    for (_COLLECTIONS_SIZE_T i = 0; i < (src)->len; ++i) {\
         list_append((dst), (src)->data[i]);\
     }\
 } while(0)
@@ -189,7 +219,7 @@ do {\
     if ((list)->len <= 0) break;\
     _COLLECTIONS_LIST_FPRINTF((file), "{");\
     _COLLECTIONS_LIST_FPRINTF((file), fmt, fmt_arg((list)->data[0]));\
-    for (___COLLECTIONS_LIST_SIZE_T i = 1; i < (list)->len; i++) {\
+    for (_COLLECTIONS_SIZE_T i = 1; i < (list)->len; i++) {\
         _COLLECTIONS_LIST_FPRINTF((file), ", " fmt, fmt_arg((list)->data[i]));\
     }\
     _COLLECTIONS_LIST_FPRINTF((file), "}");\
@@ -281,6 +311,10 @@ do {\
 #define ___COLLECTIONS_STRMAP_HEADER
 
 /** @cond */
+#ifndef _COLLECTIONS_STRMAP_APIDEF
+#define _COLLECTIONS_STRMAP_APIDEF _COLLECTIONS_APIDEF
+#endif // _COLLECTIONS_STRMAP_APIDEF
+
 #ifndef _COLLECTIONS_STRMAP_ASSERT
 #define _COLLECTIONS_STRMAP_ASSERT _COLLECTIONS_ASSERT
 #endif // _COLLECTIONS_STRMAP_ASSERT
@@ -309,12 +343,9 @@ do {\
 #define _COLLECTIONS_STRMAP_FPRINTF _COLLECTIONS_FPRINTF
 #endif // _COLLECTIONS_STRMAP_FPRINTF
 
-#ifdef __SIZE_TYPE__
-#define ___COLLECTIONS_STRMAP_SIZE_T __SIZE_TYPE__
-#else // __SIZE_TYPE__
-// fallback to size_t
-#define ___COLLECTIONS_STRMAP_SIZE_T size_t
-#endif // __SIZE_TYPE__
+#ifdef _COLLECTIONS_SIZE_T
+#define _COLLECTIONS_STRMAP_SIZE_T _COLLECTIONS_SIZE_T
+#endif // _COLLECTIONS_SIZE_T
 /** @endcond */
 
 #define StrMap(ty)\
@@ -324,15 +355,15 @@ struct {\
         int marker;\
     }* keys;\
     ty* data;\
-    ___COLLECTIONS_STRMAP_SIZE_T _data_field_size;\
-    ___COLLECTIONS_STRMAP_SIZE_T _key_field_size;\
-    ___COLLECTIONS_STRMAP_SIZE_T len;\
-    ___COLLECTIONS_STRMAP_SIZE_T cap;\
+    _COLLECTIONS_STRMAP_SIZE_T _data_field_size;\
+    _COLLECTIONS_STRMAP_SIZE_T _key_field_size;\
+    _COLLECTIONS_STRMAP_SIZE_T len;\
+    _COLLECTIONS_STRMAP_SIZE_T cap;\
 }
 
-void* ___strmap_put(void* map, const char* key, void* data, ___COLLECTIONS_STRMAP_SIZE_T data_size);
-void* ___strmap_get(void* map, const char* key);
-int ___strmap_remove(void* map, const char* key, void* out);
+_COLLECTIONS_STRMAP_APIDEF void* ___strmap_put(void* map, const char* key, void* data, _COLLECTIONS_STRMAP_SIZE_T data_size);
+_COLLECTIONS_STRMAP_APIDEF void* ___strmap_get(void* map, const char* key);
+_COLLECTIONS_STRMAP_APIDEF int ___strmap_remove(void* map, const char* key, void* out);
 
 #define strmap_put(map, key, val) do {\
     __typeof__(*(map)->data) v = (val);\
@@ -361,8 +392,8 @@ do {\
         _COLLECTIONS_STRMAP_FPRINTF((file), "}\n");\
         break;\
     }\
-    ___COLLECTIONS_STRMAP_SIZE_T found = 0;\
-    for (___COLLECTIONS_STRMAP_SIZE_T i = 0; i < (map)->cap; i++) {\
+    _COLLECTIONS_STRMAP_SIZE_T found = 0;\
+    for (_COLLECTIONS_STRMAP_SIZE_T i = 0; i < (map)->cap; i++) {\
         if ((map)->keys[i].key != NULL && (map)->keys[i].marker == 1) {\
             found++;\
             _COLLECTIONS_STRMAP_FPRINTF((file), "    "fmt_key": "fmt_data",\n", fmt_key_arg((map)->keys[i].key), fmt_data_arg((map)->data[i]));\
@@ -379,8 +410,8 @@ do {\
 #define strmap_iter(map, key_iter, val_iter, ...)\
 do {\
     if ((map)->len <= 0 || (map)->data == NULL) break;\
-    ___COLLECTIONS_STRMAP_SIZE_T __collections_h_iter_found = 0;\
-    for (___COLLECTIONS_STRMAP_SIZE_T __collections_h_iter_i = 0; __collections_h_iter_i < (map)->cap; __collections_h_iter_i++) {\
+    _COLLECTIONS_STRMAP_SIZE_T __collections_h_iter_found = 0;\
+    for (_COLLECTIONS_STRMAP_SIZE_T __collections_h_iter_i = 0; __collections_h_iter_i < (map)->cap; __collections_h_iter_i++) {\
         if ((map)->keys[__collections_h_iter_i].key != NULL && (map)->keys[__collections_h_iter_i].marker == 1) {\
             __collections_h_iter_found++;\
             __typeof__((map)->keys[__collections_h_iter_i].key) key_iter = (map)->keys[__collections_h_iter_i].key;\
@@ -404,14 +435,14 @@ struct ___Collections_StrMap_Generic  {
         int marker;
     }* keys;
     void* data;
-    ___COLLECTIONS_STRMAP_SIZE_T _data_field_size;
-    ___COLLECTIONS_STRMAP_SIZE_T _key_field_size;
-    ___COLLECTIONS_STRMAP_SIZE_T len;
-    ___COLLECTIONS_STRMAP_SIZE_T cap;
+    _COLLECTIONS_STRMAP_SIZE_T _data_field_size;
+    _COLLECTIONS_STRMAP_SIZE_T _key_field_size;
+    _COLLECTIONS_STRMAP_SIZE_T len;
+    _COLLECTIONS_STRMAP_SIZE_T cap;
 };
 
 // https://gist.github.com/MohamedTaha98/ccdf734f13299efb73ff0b12f7ce429f
-unsigned long ___strmap_djb2(const char *str) {
+_COLLECTIONS_STRMAP_APIDEF unsigned long ___strmap_djb2(const char *str) {
         unsigned long hash = 5381;
         int c;
         while ((c = *str++))
@@ -420,8 +451,8 @@ unsigned long ___strmap_djb2(const char *str) {
 
 }
 
-___COLLECTIONS_STRMAP_SIZE_T ___strmap_index(struct ___Collections_StrMap_Generic* map, const char* key) {
-    ___COLLECTIONS_STRMAP_SIZE_T index = ___strmap_djb2(key) & (map->cap - 1);
+_COLLECTIONS_STRMAP_APIDEF _COLLECTIONS_STRMAP_SIZE_T ___strmap_index(struct ___Collections_StrMap_Generic* map, const char* key) {
+    _COLLECTIONS_STRMAP_SIZE_T index = ___strmap_djb2(key) & (map->cap - 1);
     while (index < map->cap) {
         if (map->keys[index].key != NULL && _COLLECTIONS_STRMAP_STRCMP(map->keys[index].key, key) == 0) {
             return index;
@@ -434,7 +465,7 @@ ___COLLECTIONS_STRMAP_SIZE_T ___strmap_index(struct ___Collections_StrMap_Generi
     return map->cap + 1;
 }
 
-void* ___strmap_put(void* map, const char* key, void* data, ___COLLECTIONS_STRMAP_SIZE_T data_size) {
+_COLLECTIONS_STRMAP_APIDEF void* ___strmap_put(void* map, const char* key, void* data, _COLLECTIONS_STRMAP_SIZE_T data_size) {
     struct ___Collections_StrMap_Generic* map_ = map;
     if ((map_->len + 1) >= map_->cap) {
         if (map_->cap == 0) map_->_data_field_size = data_size;
@@ -442,7 +473,7 @@ void* ___strmap_put(void* map, const char* key, void* data, ___COLLECTIONS_STRMA
         map_->data = _COLLECTIONS_STRMAP_REALLOC(map_->data, map_->cap * map_->_data_field_size);
         map_->keys = _COLLECTIONS_STRMAP_REALLOC(map_->keys, map_->cap * sizeof(*map_->keys));
     }
-    ___COLLECTIONS_STRMAP_SIZE_T index = ___strmap_index(map, key);
+    _COLLECTIONS_STRMAP_SIZE_T index = ___strmap_index(map, key);
     if (index > map_->cap) return NULL;
     char* map_data = (char*)map_->data + map_->_data_field_size * index;
     _COLLECTIONS_STRMAP_MEMCPY(map_data, data, map_->_data_field_size);
@@ -453,10 +484,10 @@ void* ___strmap_put(void* map, const char* key, void* data, ___COLLECTIONS_STRMA
     return map_data;
 }
 
-void* ___strmap_get(void* map, const char* key) {
+_COLLECTIONS_STRMAP_APIDEF void* ___strmap_get(void* map, const char* key) {
     struct ___Collections_StrMap_Generic* map_ = map;
     if (map_->cap == 0 || map_->len == 0 || map_->data == NULL) return NULL;
-    ___COLLECTIONS_STRMAP_SIZE_T index = ___strmap_index(map, key);
+    _COLLECTIONS_STRMAP_SIZE_T index = ___strmap_index(map, key);
     if (index >= map_->cap) return NULL;
     if (map_->keys[index].marker != 1) return NULL;
     char* map_data = (char*)map_->data + map_->_data_field_size * index;
@@ -464,10 +495,10 @@ void* ___strmap_get(void* map, const char* key) {
     return map_data;
 }
 
-int ___strmap_remove(void* map, const char* key, void* out) {
+_COLLECTIONS_STRMAP_APIDEF int ___strmap_remove(void* map, const char* key, void* out) {
     struct ___Collections_StrMap_Generic* map_ = map;
     if (map_->cap == 0 || map_->len == 0 || map_->data == NULL) return 0;
-    ___COLLECTIONS_STRMAP_SIZE_T index = ___strmap_index(map, key);
+    _COLLECTIONS_STRMAP_SIZE_T index = ___strmap_index(map, key);
     if (index >= map_->cap) return 0;
     map_->keys[index].marker = 0;
     map_->len--;
@@ -485,3 +516,465 @@ int ___strmap_remove(void* map, const char* key, void* out) {
 #endif // COLLECTIONS_IMPORT_STRMAP_IMPLEMENTATION
 
 #endif // COLLECTIONS_IMPORT_STRMAP
+
+#ifdef COLLECTIONS_IMPORT_STRING_VIEW
+#ifndef ___COLLECTIONS_STRING_VIEW_HEADER
+#define ___COLLECTIONS_STRING_VIEW_HEADER
+
+#ifndef _COLLECTIONS_STRING_VIEW_APIDEF
+#define _COLLECTIONS_STRING_VIEW_APIDEF _COLLECTIONS_APIDEF
+#endif // _COLLECTIONS_STRING_VIEW_APIDEF
+
+#ifndef _COLLECTIONS_STRING_VIEW_SIZE_T
+#define _COLLECTIONS_STRING_VIEW_SIZE_T _COLLECTIONS_SIZE_T
+#endif // _COLLECTIONS_STRING_VIEW_SIZE_T
+
+#ifndef _COLLECTIONS_STRING_VIEW_ASSERT
+#define _COLLECTIONS_STRING_VIEW_ASSERT _COLLECTIONS_ASSERT
+#endif // _COLLECTIONS_STRING_VIEW_ASSERT
+
+#ifndef _COLLECTIONS_STRING_VIEW_STRLEN
+#define _COLLECTIONS_STRING_VIEW_STRLEN _COLLECTIONS_STRLEN
+#endif // _COLLECTIONS_STRING_VIEW_STRLEN
+
+#ifndef _COLLECTIONS_STRING_VIEW_MEMCPY
+#define _COLLECTIONS_STRING_VIEW_MEMCPY _COLLECTIONS_MEMCPY
+#endif // _COLLECTIONS_STRING_VIEW_MEMCPY
+
+#ifndef _COLLECTIONS_STRING_VIEW_MALLOC
+#define _COLLECTIONS_STRING_VIEW_MALLOC _COLLECTIONS_MALLOC
+#endif // _COLLECTIONS_STRING_VIEW_MALLOC
+
+#ifndef _COLLECTIONS_STRING_VIEW_ISSPACE
+#define _COLLECTIONS_STRING_VIEW_ISSPACE _COLLECTIONS_ISSPACE
+#endif // _COLLECTIONS_STRING_VIEW_ISSPACE
+
+typedef struct {
+    const char* data;
+    _COLLECTIONS_STRING_VIEW_SIZE_T len;
+} StringView;
+
+typedef struct {
+    union {
+        struct {
+            union {
+                StringView start;
+                StringView left;
+                StringView l;
+            };
+            union {
+                StringView end;
+                StringView right;
+                StringView r;
+            };
+        };
+        StringView v[2];
+    };
+} StringViewPair;
+
+#define SV_FMT "%.*s"
+#define SV_ARG(sv) (int)(sv).len, (sv).data
+
+#define sv(cstr)\
+(StringView) {\
+    .data = (cstr),\
+    .len = _COLLECTIONS_STRING_VIEW_STRLEN((cstr)),\
+}
+
+#define sv_copy_cstr(sv, dst)\
+(_COLLECTIONS_STRING_VIEW_ASSERT((dst) != NULL), _COLLECTIONS_STRING_VIEW_MEMCPY((dst), (sv).data, (sv).len), (dst)[(sv).len] = 0)
+
+#define sv_alloc_cstr(sv) sv_copy_cstr((sv), _COLLECTIONS_STRING_VIEW_MALLOC(((sv).len + 1) * sizeof(char)));
+
+#define sv_slice(sv, start, len)\
+(_COLLECTIONS_STRING_VIEW_ASSERT(((len) + (start)) <= (sv).len), (StringView) {\
+    .data = (sv).data + (start),\
+    .len = (len),\
+})
+
+// [start, end)
+#define sv_slice_range(sv, start, end)\
+(_COLLECTIONS_STRING_VIEW_ASSERT((end) >= (start)), _COLLECTIONS_STRING_VIEW_ASSERT(((end) - (start)) <= (sv).len), (StringView) {\
+    .data = (sv).data + (start),\
+    .len = (end) - (start),\
+})
+
+#define sv_split(sv, i)\
+(_COLLECTIONS_STRING_VIEW_ASSERT((i) < (sv).len), (StringViewPair) {\
+    .left = (StringView) {\
+        .data = (sv).data,\
+        .len = (i),\
+    },\
+    .right = (StringView) {\
+        .data = (sv).data + (i),\
+        .len = (sv).len - (i),\
+    }\
+})
+
+#define sv_chop(sv, n)\
+(_COLLECTIONS_STRING_VIEW_ASSERT((n) <= (sv).len), (StringView) {\
+    .data = (sv).data + (n),\
+    .len = (sv).len - (n)\
+})
+
+#define sv_chop_end(sv, n)\
+(_COLLECTIONS_STRING_VIEW_ASSERT((n) <= (sv).len), (StringView) {\
+    .data = (sv).data,\
+    .len = (sv).len - (n)\
+})
+
+#define sv_trim_matches(sv, matches) sv_trim_end_matches(sv_trim_start_matches((sv), (matches)).right, (matches)).left
+_COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_start_matches(StringView sv, int (*matches)(int));
+_COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_end_matches(StringView sv, int (*matches)(int));
+#define sv_chop_matches sv_trim_start_matches
+#define sv_chop_end_matches sv_trim_end_matches
+
+#define sv_trim_unless(sv, unless) sv_trim_end_unless(sv_trim_start_unless((sv), (unless)).right, (unless)).left
+_COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_start_unless(StringView sv, int (*unless)(int));
+_COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_end_unless(StringView sv, int (*unless)(int));
+#define sv_chop_unless sv_trim_start_unless
+#define sv_chop_end_unless sv_trim_end_unless
+
+// trim whitespace
+#define sv_trim(sv) sv_trim_end(sv_trim_start((sv)).right).left
+#define sv_trim_start(sv) sv_trim_start_matches((sv), _COLLECTIONS_STRING_VIEW_ISSPACE)
+#define sv_trim_end(sv) sv_trim_end_matches((sv), _COLLECTIONS_STRING_VIEW_ISSPACE)
+
+#define sv_trim_while(sv, pat) sv_trim_end_while(sv_trim_start_while((sv), (pat)).right, (pat)).left
+_COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_start_while(StringView sv, const char* pat);
+_COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_end_while(StringView sv, const char* pat);
+#define sv_chop_while sv_trim_start_while
+#define sv_chop_end_while sv_trim_end_while
+
+#define sv_trim_until(sv, pat) sv_trim_end_until(sv_trim_start_until((sv), (pat)).right, (pat)).left
+_COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_start_until(StringView sv, const char* pat);
+_COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_end_until(StringView sv, const char* pat);
+#define sv_chop_until sv_trim_start_until
+#define sv_chop_end_until sv_trim_end_until
+
+#define sv_trim_whilec(sv, c) sv_trim_end_whilec(sv_trim_start_whilec((sv), (c)).right, (c)).left
+_COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_start_whilec(StringView sv, char c);
+_COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_end_whilec(StringView sv, char c);
+#define sv_chop_whilec sv_trim_start_whilec
+#define sv_chop_end_whilec sv_trim_end_whilec
+
+#define sv_trim_untilc(sv, c) sv_trim_end_untilc(sv_trim_start_untilc((sv), (c)).right, (c)).left
+_COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_start_untilc(StringView sv, char c);
+_COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_end_untilc(StringView sv, char c);
+#define sv_chop_untilc sv_trim_start_untilc
+#define sv_chop_end_untilc sv_trim_end_untilc
+
+#endif // ___COLLECTIONS_STRING_VIEW_HEADER
+
+#ifdef COLLECTIONS_IMPORT_STRING_VIEW_IMPLEMENTATION
+#ifndef ___COLLECTIONS_STRING_VIEW_IMPLEMENTATION
+#define ___COLLECTIONS_STRING_VIEW_IMPLEMENTATION
+
+_COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_start_matches(StringView sv, int (*matches)(int)) {
+    if (sv.len == 0) return (StringViewPair) { .l = sv, .r = sv };
+    _COLLECTIONS_STRING_VIEW_SIZE_T i = 0;
+    while (i < sv.len) {
+        if (matches(sv.data[i])) {
+            i++;
+        } else {
+            break;
+        }
+    }
+    return (StringViewPair) {
+        .left = (StringView) {
+            .data = sv.data,
+            .len = i
+        },
+
+        .right = (StringView) {
+            .data = sv.data + i,
+            .len = sv.len - i
+        }
+    };
+}
+_COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_end_matches(StringView sv, int (*matches)(int)) {
+    if (sv.len == 0) return (StringViewPair) { .l = sv, .r = sv };
+    _COLLECTIONS_STRING_VIEW_SIZE_T len = sv.len;
+    while (len > 0) {
+        if (matches(sv.data[len - 1])) {
+            len--;
+        } else {
+            break;
+        }
+    }
+
+    return (StringViewPair) {
+        .left = (StringView) {
+            .data = sv.data,
+            .len = len
+        },
+
+        .right = (StringView) {
+            .data = sv.data + len,
+            .len = sv.len - len
+        }
+    };
+}
+
+
+_COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_start_unless(StringView sv, int (*unless)(int)) {
+    if (sv.len == 0) return (StringViewPair) { .l = sv, .r = sv };
+    _COLLECTIONS_STRING_VIEW_SIZE_T i = 0;
+    while (i < sv.len) {
+        if (!unless(sv.data[i])) {
+            i++;
+        } else {
+            break;
+        }
+    }
+    return (StringViewPair) {
+        .left = (StringView) {
+            .data = sv.data,
+            .len = i
+        },
+
+        .right = (StringView) {
+            .data = sv.data + i,
+            .len = sv.len - i
+        }
+    };
+}
+_COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_end_unless(StringView sv, int (*unless)(int)) {
+    if (sv.len == 0) return (StringViewPair) { .l = sv, .r = sv };
+    _COLLECTIONS_STRING_VIEW_SIZE_T len = sv.len;
+    while (len > 0) {
+        if (!unless(sv.data[len - 1])) {
+            len--;
+        } else {
+            break;
+        }
+    }
+    return (StringViewPair) {
+        .left = (StringView) {
+            .data = sv.data,
+            .len = len
+        },
+
+        .right = (StringView) {
+            .data = sv.data + len,
+            .len = sv.len - len
+        }
+    };
+}
+
+_COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_start_while(StringView sv, const char* pat) {
+    if (sv.len == 0) return (StringViewPair) { .l = sv, .r = sv };
+    _COLLECTIONS_STRING_VIEW_SIZE_T pat_len = _COLLECTIONS_STRING_VIEW_STRLEN(pat);
+    _COLLECTIONS_STRING_VIEW_SIZE_T i = 0;
+    while (i < sv.len) {
+        int matches = 0;
+        for (_COLLECTIONS_STRING_VIEW_SIZE_T j = 0; j < pat_len; j++) {
+            if (sv.data[i] == pat[j]) {
+                matches = 1;
+                break;
+            }
+        }
+        if (matches) {
+            i++;
+        } else {
+            break;
+        }
+    }
+    return (StringViewPair) {
+        .left = (StringView) {
+            .data = sv.data,
+            .len = i
+        },
+
+        .right = (StringView) {
+            .data = sv.data + i,
+            .len = sv.len - i
+        }
+    };
+}
+_COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_end_while(StringView sv, const char* pat) {
+    if (sv.len == 0) return (StringViewPair) { .l = sv, .r = sv };
+    _COLLECTIONS_STRING_VIEW_SIZE_T pat_len = _COLLECTIONS_STRING_VIEW_STRLEN(pat);
+    _COLLECTIONS_STRING_VIEW_SIZE_T len = sv.len;
+    while (len > 0) {
+        int matches = 0;
+        for (_COLLECTIONS_STRING_VIEW_SIZE_T j = 0; j < pat_len; j++) {
+            if (sv.data[len - 1] == pat[j]) {
+                matches = 1;
+                break;
+            }
+        }
+        if (matches) {
+            len--;
+        } else {
+            break;
+        }
+    }
+    return (StringViewPair) {
+        .left = (StringView) {
+            .data = sv.data,
+            .len = len
+        },
+
+        .right = (StringView) {
+            .data = sv.data + len,
+            .len = sv.len - len
+        }
+    };
+}
+
+_COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_start_until(StringView sv, const char* pat) {
+    if (sv.len == 0) return (StringViewPair) { .l = sv, .r = sv };
+    _COLLECTIONS_STRING_VIEW_SIZE_T pat_len = _COLLECTIONS_STRING_VIEW_STRLEN(pat);
+    _COLLECTIONS_STRING_VIEW_SIZE_T i = 0;
+    while (i < sv.len) {
+        int matches = 0;
+        for (_COLLECTIONS_STRING_VIEW_SIZE_T j = 0; j < pat_len; j++) {
+            if (sv.data[i] == pat[j]) {
+                matches = 1;
+                break;
+            }
+        }
+        if (!matches) {
+            i++;
+        } else {
+            break;
+        }
+    }
+    return (StringViewPair) {
+        .left = (StringView) {
+            .data = sv.data,
+            .len = i
+        },
+
+        .right = (StringView) {
+            .data = sv.data + i,
+            .len = sv.len - i
+        }
+    };
+}
+_COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_end_until(StringView sv, const char* pat) {
+    if (sv.len == 0) return (StringViewPair) { .l = sv, .r = sv };
+    _COLLECTIONS_STRING_VIEW_SIZE_T pat_len = _COLLECTIONS_STRING_VIEW_STRLEN(pat);
+    _COLLECTIONS_STRING_VIEW_SIZE_T len = sv.len;
+    while (len > 0) {
+        int matches = 0;
+        for (_COLLECTIONS_STRING_VIEW_SIZE_T j = 0; j < pat_len; j++) {
+            if (sv.data[len - 1] == pat[j]) {
+                matches = 1;
+                break;
+            }
+        }
+        if (!matches) {
+            len--;
+        } else {
+            break;
+        }
+    }
+    return (StringViewPair) {
+        .left = (StringView) {
+            .data = sv.data,
+            .len = len
+        },
+
+        .right = (StringView) {
+            .data = sv.data + len,
+            .len = sv.len - len
+        }
+    };
+}
+
+_COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_start_whilec(StringView sv, char c) {
+    if (sv.len == 0) return (StringViewPair) { .l = sv, .r = sv };
+    _COLLECTIONS_STRING_VIEW_SIZE_T i = 0;
+    while (i < sv.len) {
+        if (sv.data[i] == c) {
+            i++;
+        } else {
+            break;
+        }
+    }
+    return (StringViewPair) {
+        .left = (StringView) {
+            .data = sv.data,
+            .len = i
+        },
+
+        .right = (StringView) {
+            .data = sv.data + i,
+            .len = sv.len - i
+        }
+    };
+}
+
+_COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_end_whilec(StringView sv, char c) {
+    if (sv.len == 0) return (StringViewPair) { .l = sv, .r = sv };
+    _COLLECTIONS_STRING_VIEW_SIZE_T len = sv.len;
+    while (len > 0) {
+        if (sv.data[len - 1] == c) {
+            len--;
+        } else {
+            break;
+        }
+    }
+    return (StringViewPair) {
+        .left = (StringView) {
+            .data = sv.data,
+            .len = len
+        },
+
+        .right = (StringView) {
+            .data = sv.data + len,
+            .len = sv.len - len
+        }
+    };
+}
+
+_COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_start_untilc(StringView sv, char c) {
+    if (sv.len == 0) return (StringViewPair) { .l = sv, .r = sv };
+    _COLLECTIONS_STRING_VIEW_SIZE_T i = 0;
+    while (i < sv.len) {
+        if (sv.data[i] != c) {
+            i++;
+        } else {
+            break;
+        }
+    }
+    return (StringViewPair) {
+        .left = (StringView) {
+            .data = sv.data,
+            .len = i
+        },
+
+        .right = (StringView) {
+            .data = sv.data + i,
+            .len = sv.len - i
+        }
+    };
+}
+
+_COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_end_untilc(StringView sv, char c) {
+    if (sv.len == 0) return (StringViewPair) { .l = sv, .r = sv };
+    _COLLECTIONS_STRING_VIEW_SIZE_T len = sv.len;
+    while (len > 0) {
+        if (sv.data[len - 1] != c) {
+            len--;
+        } else {
+            break;
+        }
+    }
+    return (StringViewPair) {
+        .left = (StringView) {
+            .data = sv.data,
+            .len = len
+        },
+
+        .right = (StringView) {
+            .data = sv.data + len,
+            .len = sv.len - len
+        }
+    };
+}
+#endif // ___COLLECTIONS_STRING_VIEW_IMPLEMENTATION
+#endif // COLLECTIONS_IMPORT_STRING_VIEW_IMPLEMENTATION
+#endif //  COLLECTIONS_IMPORT_STRING_VIEW

@@ -5,6 +5,7 @@
 Currently, `collections.h` has the following modules:
   * List (COLLECTIONS_IMPORT_LIST)
   * StrMap (COLLECTIONS_IMPORT_STRMAP)
+  * StringView (COLLECTIONS_IMPORT_STRING_VIEW)
 
 ### List
 Implements a generic and easy to use dynamic array/list/vector/whatever your language of choice calls it.
@@ -53,3 +54,29 @@ Implements a generic and simple HashMap with string keys. Uses linear probing, n
   }
 ```
 For more examples, check out the [StrMap examples folder](examples/strmap).
+
+### StringView
+Implements a simple StringView type and helper functions.
+
+(Truncated from [examples/list/01-string_view.c](examples/string_view/01-string_view.c))
+```c
+  #include <stdio.h>
+  #include <string.h>
+  #include <ctype.h>
+
+  // Also included in the global #define COLLECTIONS_IMPORT and
+  // #define COLLECTIONS_IMPORT_IMPLEMENTATION
+  #define COLLECTIONS_IMPORT_STRING_VIEW
+  #define COLLECTIONS_IMPORT_STRING_VIEW_IMPLEMENTATION
+  #include <collections.h>
+
+  int main() {
+      StringView s = sv("  Hello, World \t \n ");
+      s = sv_trim(s);
+      s = sv_chop_until(s, ",").end;
+      printf("'"SV_FMT"'\n", SV_ARG(s));
+      // Prints ', World'
+      return 0;
+  }
+```
+For more examples, check out the [StringView examples folder](examples/string_view).
