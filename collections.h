@@ -586,15 +586,21 @@ typedef struct {
     .len = _COLLECTIONS_STRING_VIEW_STRLEN((cstr)),\
 }
 
+#define sv_from_parts(start, _len)\
+(StringView) {\
+    .data = (start),\
+    .len = (_len)\
+}
+
 #define sv_copy_cstr(sv, dst)\
 (_COLLECTIONS_STRING_VIEW_ASSERT((dst) != NULL), _COLLECTIONS_STRING_VIEW_MEMCPY((dst), (sv).data, (sv).len), (dst)[(sv).len] = 0)
 
 #define sv_alloc_cstr(sv) sv_copy_cstr((sv), _COLLECTIONS_STRING_VIEW_MALLOC(((sv).len + 1) * sizeof(char)));
 
-#define sv_slice(sv, start, len)\
-(_COLLECTIONS_STRING_VIEW_ASSERT(((len) + (start)) <= (sv).len), (StringView) {\
+#define sv_slice(sv, start, _len)\
+(_COLLECTIONS_STRING_VIEW_ASSERT(((_len) + (start)) <= (sv).len), (StringView) {\
     .data = (sv).data + (start),\
-    .len = (len),\
+    .len = (_len),\
 })
 
 // [start, end)
@@ -616,6 +622,12 @@ typedef struct {
     }\
 })
 
+#define sv_last(sv)\
+(_COLLECTIONS_STRING_VIEW_ASSERT((sv)->data != NULL), _COLLECTIONS_STRING_VIEW_ASSERT((sv)->len > 0), (sv)->data[(sv)->len-1])
+
+#define sv_index(sv, i)\
+(_COLLECTIONS_STRING_VIEW_ASSERT((sv)->data != NULL), _COLLECTIONS_STRING_VIEW_ASSERT((i) < (sv)->len), (sv)->data[(i)])
+
 #define sv_chop(sv, n)\
 (_COLLECTIONS_STRING_VIEW_ASSERT((n) <= (sv).len), (StringView) {\
     .data = (sv).data + (n),\
@@ -627,6 +639,12 @@ typedef struct {
     .data = (sv).data,\
     .len = (sv).len - (n)\
 })
+
+#define sv_pop(sv)\
+(_COLLECTIONS_STRING_VIEW_ASSERT((sv)->data != NULL), _COLLECTIONS_STRING_VIEW_ASSERT((sv)->len > 0), (sv)->data[(sv)->len--])
+
+#define sv_pop_front(sv)\
+(_COLLECTIONS_STRING_VIEW_ASSERT((sv)->data != NULL), _COLLECTIONS_STRING_VIEW_ASSERT((sv)->len > 0), (sv)->len--, *(++(sv)->data))
 
 _COLLECTIONS_STRING_VIEW_APIDEF int sv_ncmp(StringView a, StringView b, _COLLECTIONS_STRING_VIEW_SIZE_T n);
 #define sv_cmp(a, b) sv_ncmp((a), (b), (a).len < (b).len ? (a).len : (b).len)
