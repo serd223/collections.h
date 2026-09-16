@@ -108,15 +108,23 @@
 #define _COLLECTIONS_LIST_REALLOC _COLLECTIONS_REALLOC
 #endif // _COLLECTIONS_LIST_REALLOC
 
+#ifndef _COLLECTIONS_LIST_MALLOC
+#define _COLLECTIONS_LIST_MALLOC _COLLECTIONS_MALLOC
+#endif // _COLLECTIONS_LIST_MALLOC
+
 #ifndef _COLLECTIONS_LIST_MEMMOVE
 #define _COLLECTIONS_LIST_MEMMOVE _COLLECTIONS_MEMMOVE
 #endif // _COLLECTIONS_LIST_MEMMOVE
+
+#ifndef _COLLECTIONS_LIST_MEMCPY
+#define _COLLECTIONS_LIST_MEMCPY _COLLECTIONS_MEMCPY
+#endif // _COLLECTIONS_LIST_MEMCPY
 
 #ifndef _COLLECTIONS_LIST_FPRINTF
 #define _COLLECTIONS_LIST_FPRINTF _COLLECTIONS_FPRINTF
 #endif // _COLLECTIONS_LIST_FPRINTF
 
-#ifndef _COLLECTIONS_SIZE_T
+#ifndef _COLLECTIONS_LIST_SIZE_T
 #define _COLLECTIONS_LIST_SIZE_T _COLLECTIONS_SIZE_T
 #endif // _COLLECTIONS_SIZE_T
 /** @endcond */
@@ -124,8 +132,8 @@
 /** @brief Helper macro that add necessary list fields of type `ty` to your struct */
 #define LIST_FIELDS(ty)\
 ty* data;\
-_COLLECTIONS_SIZE_T len;\
-_COLLECTIONS_SIZE_T cap
+_COLLECTIONS_LIST_SIZE_T len;\
+_COLLECTIONS_LIST_SIZE_T cap
 
 /** @brief Refers to an anonymus struct for a List of type `ty` */
 #define List(ty)\
@@ -149,6 +157,27 @@ do {\
     (list)->data[(list)->len++] = (val);\
 } while(0)
 
+
+#define list_new(...)\
+{\
+    .data = _COLLECTIONS_LIST_MEMCPY(_COLLECTIONS_LIST_MALLOC(sizeof((__VA_ARGS__))), (__VA_ARGS__), sizeof((__VA_ARGS__))),\
+    .len = sizeof((__VA_ARGS__))/sizeof(*(__VA_ARGS__)),\
+    .cap = sizeof((__VA_ARGS__))/sizeof(*(__VA_ARGS__))\
+}
+
+#define list_dup(src)\
+{\
+    .data = _COLLECTIONS_LIST_MEMCPY(_COLLECTIONS_LIST_MALLOC(sizeof(__typeof__(*(src)->data)) * (src)->len), (src)->data, sizeof(__typeof__(*(src)->data)) * (src)->len),\
+    .len = (src)->len,\
+    .cap = (src)->len\
+}
+
+#define list_last(src)\
+(_COLLECTIONS_LIST_ASSERT((src)->data != NULL), _COLLECTIONS_LIST_ASSERT((src)->len > 0), (src)->data[(src)->len-1])
+
+#define list_index(src, i)\
+(_COLLECTIONS_LIST_ASSERT((src)->data != NULL), _COLLECTIONS_LIST_ASSERT((i) < (src)->len), (src)->data[(i)])
+
 /**
  * @brief Appends `val` to the supplied `list`
  * @fn list_pop(list)
@@ -169,7 +198,7 @@ do {\
 #define list_copy(src, dst)\
 do {\
     (dst)->len = 0;\
-    for (_COLLECTIONS_SIZE_T i = 0; i < (src)->len; ++i) {\
+    for (_COLLECTIONS_LIST_SIZE_T i = 0; i < (src)->len; ++i) {\
         list_append((dst), (src)->data[i]);\
     }\
 } while(0)
@@ -184,7 +213,7 @@ do {\
  * @param %list Pointer to a valid List type
  * @param iterator The name that will be used for the iterator variable
 */
-#define list_iter(list, iterator) for (__typeof__((list)->data) it = (list)->data; it < (list)->data + (list)->len; ++it)
+#define list_iter(list, iterator) for (__typeof__((list)->data) iterator = (list)->data; iterator < (list)->data + (list)->len; ++iterator)
 
 /**
  * @brief Removes the element at index `index` from `list` and shifts remaining elements accordingly
@@ -224,7 +253,7 @@ do {\
     if ((list)->len <= 0) break;\
     _COLLECTIONS_LIST_FPRINTF((file), "{");\
     _COLLECTIONS_LIST_FPRINTF((file), fmt, fmt_arg((list)->data[0]));\
-    for (_COLLECTIONS_SIZE_T i = 1; i < (list)->len; i++) {\
+    for (_COLLECTIONS_LIST_SIZE_T i = 1; i < (list)->len; i++) {\
         _COLLECTIONS_LIST_FPRINTF((file), ", " fmt, fmt_arg((list)->data[i]));\
     }\
     _COLLECTIONS_LIST_FPRINTF((file), "}");\
@@ -296,6 +325,80 @@ do {\
  * @param fmt_arg Macro that will be applied to each element while printing for even more configuration (like for user defined 'String View' types). LIST_FMT_ARG can be used as a default.
 */
 #define list_dbgn_ext(list, fmt, fmt_arg) list_fdbgn_ext(stdout, (list), fmt, fmt_arg)
+
+
+// Companion read-only view type for List
+#define Span(ty)\
+struct {\
+    const ty* data;\
+    _COLLECTIONS_LIST_SIZE_T len;\
+}
+
+// src can be List, Span, or even StringView
+#define span(src)\
+{\
+    .data = (src)->data,\
+    .len = (src)->len\
+}
+
+#define span_from_array(arr)\
+{\
+    .data = (arr),\
+    .len = sizeof((arr))/sizeof(*(arr))\
+}
+
+#define span_from_parts(ptr, _len)\
+{\
+    .data = (ptr),\
+    .len = (_len)\
+}
+
+#define span_slice(src, start, _len)\
+do {\
+    _COLLECTIONS_LIST_ASSERT(((_len) + (start)) <= (src)->len);\
+    (src)->data = (start);\
+    (src)->len = (_len);\
+} while(0)
+
+#define span_last list_last
+#define span_index list_index
+#define span_iter list_iter
+
+#define span_slice_range(src, start, end)\
+do {\
+    _COLLECTIONS_LIST_ASSERT((end) >= (start));\
+    _COLLECTIONS_LIST_ASSERT(((end) - (start)) <= (src)->len);\
+    (src)->data = (src)->data + (start);\
+    (src)->len = (end) - (start);\
+} while(0)
+
+#define span_chop(src, n)\
+do {\
+    _COLLECTIONS_LIST_ASSERT((n) <= (src)->len);\
+    (src)->data = (src)->data + (n);\
+    (src)->len = (src)->len - (n);\
+} while(0)
+
+#define span_chop_end(src, n)\
+do {\
+    _COLLECTIONS_LIST_ASSERT((n) <= (src)->len);\
+    (src)->data = (src)->data;\
+    (src)->len = (src)->len - (n);\
+} while(0)
+
+#define span_pop list_pop
+
+#define span_pop_front(src)\
+(_COLLECTIONS_LIST_ASSERT((src)->data != NULL), _COLLECTIONS_LIST_ASSERT((src)->len > 0), (src)->len--, *(++(src)->data))
+
+#define span_fdbg list_fdbg
+#define span_fdbg_ext list_fdbg_ext
+#define span_fdbgn list_fdbgn
+#define span_fdbgn_ext list_fdbgn_ext
+#define span_dbg list_dbg
+#define span_dbg_ext list_dbg_ext
+#define span_dbgn list_dbgn
+#define span_dbgn_ext list_dbgn_ext
 
 #endif // ___COLLECTIONS_LIST_HEADER
 
