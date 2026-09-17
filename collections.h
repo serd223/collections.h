@@ -464,7 +464,6 @@ struct {\
     }* keys;\
     ty* data;\
     _COLLECTIONS_STRMAP_SIZE_T _data_field_size;\
-    _COLLECTIONS_STRMAP_SIZE_T _key_field_size;\
     _COLLECTIONS_STRMAP_SIZE_T len;\
     _COLLECTIONS_STRMAP_SIZE_T cap;\
 }
@@ -539,12 +538,11 @@ do {\
 
 struct ___Collections_StrMap_Generic  {
     struct {
-        void* key;
+        char* key;
         int marker;
     }* keys;
     void* data;
     _COLLECTIONS_STRMAP_SIZE_T _data_field_size;
-    _COLLECTIONS_STRMAP_SIZE_T _key_field_size;
     _COLLECTIONS_STRMAP_SIZE_T len;
     _COLLECTIONS_STRMAP_SIZE_T cap;
 };

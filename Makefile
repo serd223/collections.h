@@ -1,5 +1,14 @@
-.PHONY: all docs
+.PHONY: all docs test
 all: build/01-list build/02-list build/03-list build/04-list build/01-strmap build/01-string_view build/02-string_view
+
+test: build/01-list build/02-list build/03-list build/04-list build/01-strmap build/01-string_view build/02-string_view
+	./build/01-list
+	./build/02-list
+	./build/03-list
+	./build/04-list
+	./build/01-strmap
+	./build/01-string_view
+	./build/02-string_view
 
 CFLAGS=-Wall -Wextra -std=c99 -g
 
