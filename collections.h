@@ -157,19 +157,20 @@ do {\
     (list)->data[(list)->len++] = (val);\
 } while(0)
 
+#define ___COLLECTIONS_LIST_GET_CAP(s) (((s) % 16 == 0) ? (s) : (((s) / 16) + 1) * 16)
 
 #define list_new(...)\
 {\
-    .data = _COLLECTIONS_LIST_MEMCPY(_COLLECTIONS_LIST_MALLOC(sizeof((__VA_ARGS__))), (__VA_ARGS__), sizeof((__VA_ARGS__))),\
+    .data = _COLLECTIONS_LIST_MEMCPY(_COLLECTIONS_LIST_MALLOC(sizeof(*(__VA_ARGS__)) * ___COLLECTIONS_LIST_GET_CAP(sizeof((__VA_ARGS__))/sizeof(*(__VA_ARGS__)))), (__VA_ARGS__), sizeof((__VA_ARGS__))),\
     .len = sizeof((__VA_ARGS__))/sizeof(*(__VA_ARGS__)),\
-    .cap = sizeof((__VA_ARGS__))/sizeof(*(__VA_ARGS__))\
+    .cap = ___COLLECTIONS_LIST_GET_CAP(sizeof((__VA_ARGS__))/sizeof(*(__VA_ARGS__)))\
 }
 
 #define list_dup(src)\
 {\
-    .data = _COLLECTIONS_LIST_MEMCPY(_COLLECTIONS_LIST_MALLOC(sizeof(__typeof__(*(src)->data)) * (src)->len), (src)->data, sizeof(__typeof__(*(src)->data)) * (src)->len),\
+    .data = _COLLECTIONS_LIST_MEMCPY(_COLLECTIONS_LIST_MALLOC(sizeof(__typeof__(*(src)->data)) * ___COLLECTIONS_LIST_GET_CAP((src)->len)), (src)->data, sizeof(__typeof__(*(src)->data)) * (src)->len),\
     .len = (src)->len,\
-    .cap = (src)->len\
+    .cap = ___COLLECTIONS_LIST_GET_CAP((src)->len)\
 }
 
 #define list_last(src)\
