@@ -1,0 +1,10 @@
+{
+    "a": 1.000000,
+    "b": 2.000000,
+    "c": 3.000000,
+    "d": 4.000000,
+}
+Removed key with weight '4.000000'
+Key 'a' has weight '1.000000'
+Key 'b' has weight '2.000000'
+Key 'c' has weight '3.000000'

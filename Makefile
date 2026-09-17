@@ -1,14 +1,11 @@
-.PHONY: all docs test
+.PHONY: all docs test clean
 all: build/01-list build/02-list build/03-list build/04-list build/01-strmap build/01-string_view build/02-string_view
 
-test: build/01-list build/02-list build/03-list build/04-list build/01-strmap build/01-string_view build/02-string_view
-	./build/01-list
-	./build/02-list
-	./build/03-list
-	./build/04-list
-	./build/01-strmap
-	./build/01-string_view
-	./build/02-string_view
+test: all
+	./tests/test_examples.sh test
+
+clean:
+	rm -rf ./build/*
 
 CFLAGS=-Wall -Wextra -std=c99 -g
 
