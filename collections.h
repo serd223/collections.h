@@ -26,6 +26,24 @@ IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
+/*
+This a "module based" single header C library similar to [stb libraries](https://github.com/nothings/stb)
+
+Before including this header, you need to "import" modules by defining their corresponding import macro:
+    - COLLECTIONS_IMPORT_LIST
+    - COLLECTIONS_IMPORT_STRMAP
+    - COLLECTIONS_IMPORT_STRING_VIEW
+    - COLLECTIONS_IMPORT (implicitly imports the others)
+
+Similar to stb, you may also need to define an include implementation macro for certain modules. Please note that you still need to import the module itself in order to import its implementation:
+    - COLLECTIONS_IMPORT_LIST_IMPLEMENTATION
+    - COLLECTIONS_IMPORT_STRMAP_IMPLEMENTATION
+    - COLLECTIONS_IMPORT_STRING_VIEW_IMPLEMENTATION
+    - COLLECTIONS_IMPORT_IMPLEMENTATION (implicitly imports all implementations for already imported modules)
+
+By only importing modules you plan on using, you can keep your namespace clean and avoid name collisions
+*/
+
 /** @file collections.h
     The main source file of collections.h.
 */
