@@ -481,10 +481,13 @@ _COLLECTIONS_STRMAP_APIDEF int ___strmap_remove(void* map, const char* key, void
 #define strmap_get(map, key) (__typeof__((map)->data))___strmap_get((map), (key))
 #define strmap_remove(map, key, out) ___strmap_remove((map), (key), (out))
 
-#define strmap_free(map)\
+#define strmap_free(map) strmap_free_ext((map), NULL)
+
+#define strmap_free_ext(map, val_free)\
 do {\
+    void (*free_func)(__typeof__(*(map)->data)) = val_free;\
     strmap_iter((map), k, v, {\
-        (void)v;\
+        if ((val_free) != NULL) free_func(*v);\
         _COLLECTIONS_STRMAP_FREE(k);\
     });\
     _COLLECTIONS_STRMAP_FREE((map)->keys);\
