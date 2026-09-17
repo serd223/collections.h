@@ -8,7 +8,7 @@ Currently, `collections.h` has the following modules:
   * StringView (COLLECTIONS_IMPORT_STRING_VIEW)
 
 ### List
-Implements a generic and easy to use dynamic array/list/vector/whatever your language of choice calls it.
+Implements a generic and easy to use dynamic array/list/vector/whatever your language of choice calls it, along with a companion Span type to act as a const view on the List.
 
 (Truncated from [examples/list/01-list.c](examples/list/01-list.c))
 ```c
@@ -23,6 +23,8 @@ Implements a generic and easy to use dynamic array/list/vector/whatever your lan
     list_append(&values, 10);
     list_append(&values, 20);
     list_append(&values, 30);
+    // This would also work:
+    // List(int) values = list_new((int[]){10, 20, 30})
     list_dbgn(&values, "%d");
     // prints "{10, 20, 30}" with a newline
   }
@@ -80,3 +82,16 @@ Implements a simple StringView type and helper functions.
   }
 ```
 For more examples, check out the [StringView examples folder](examples/string_view).
+
+## Tests & Examples
+You can run the following to build all examples:
+```
+  $ make
+```
+The binaries are placed under the `build` directory (created if it doesn't exist).
+
+
+You can run the following to test all examples against pre-recorded test cases:
+```
+  $ make test
+```
