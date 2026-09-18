@@ -731,6 +731,12 @@ typedef struct {
 #define SV_FMT "%.*s"
 #define SV_ARG(sv) (int)(sv).len, (sv).data
 
+#define sv_lit(string_literal)\
+(StringView) {\
+    .data = (string_literal),\
+    .len = sizeof((string_literal)) - 1,\
+}
+
 #define sv(cstr)\
 (StringView) {\
     .data = (cstr),\
