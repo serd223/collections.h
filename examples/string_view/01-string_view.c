@@ -18,5 +18,6 @@ int main() {
     s = sv_chop_until(s, ",").end;
 
     printf("'"SV_FMT"'\n", SV_ARG(s));
+    printf("%s\n", sv_eq(s, sv(", World")) ? "true" : "false");
     return 0;
 }

@@ -797,6 +797,7 @@ typedef struct {
 #define sv_pop_front(sv)\
 (_COLLECTIONS_STRING_VIEW_ASSERT((sv)->data != NULL), _COLLECTIONS_STRING_VIEW_ASSERT((sv)->len > 0), (sv)->len--, *(++(sv)->data))
 
+_COLLECTIONS_STRING_VIEW_APIDEF int sv_eq(StringView a, StringView b); // 1 if same, 0 if not
 _COLLECTIONS_STRING_VIEW_APIDEF int sv_ncmp(StringView a, StringView b, _COLLECTIONS_STRING_VIEW_SIZE_T n);
 #define sv_cmp(a, b) sv_ncmp((a), (b), (a).len < (b).len ? (a).len : (b).len)
 
@@ -846,6 +847,14 @@ _COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_end_untilc(StringView sv,
 #ifdef COLLECTIONS_IMPORT_STRING_VIEW_IMPLEMENTATION
 #ifndef ___COLLECTIONS_STRING_VIEW_IMPLEMENTATION
 #define ___COLLECTIONS_STRING_VIEW_IMPLEMENTATION
+
+_COLLECTIONS_STRING_VIEW_APIDEF int sv_eq(StringView a, StringView b) {
+    if (a.len != b.len) return 0;
+    for (_COLLECTIONS_STRING_VIEW_SIZE_T i = 0; i < a.len; i++) {
+        if (a.data[i] != b.data[i]) return 0;
+    }
+    return 1;
+}
 
 _COLLECTIONS_STRING_VIEW_APIDEF int sv_ncmp(StringView a, StringView b, _COLLECTIONS_STRING_VIEW_SIZE_T n) {
     n = n > a.len ? a.len : n;
