@@ -1,4 +1,6 @@
 '  Hello, World 	 
  '
 ', World'
-true
+sv_eq(", World", ", World")      = true
+sv_starts_with(", World", ", W") = true
+sv_contains(", World", "orl")    = true

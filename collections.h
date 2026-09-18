@@ -800,6 +800,8 @@ typedef struct {
 _COLLECTIONS_STRING_VIEW_APIDEF int sv_eq(StringView a, StringView b); // 1 if same, 0 if not
 _COLLECTIONS_STRING_VIEW_APIDEF int sv_ncmp(StringView a, StringView b, _COLLECTIONS_STRING_VIEW_SIZE_T n);
 #define sv_cmp(a, b) sv_ncmp((a), (b), (a).len < (b).len ? (a).len : (b).len)
+_COLLECTIONS_STRING_VIEW_APIDEF int sv_starts_with(StringView s, StringView prefix); // 1 if yes, 0 if no
+_COLLECTIONS_STRING_VIEW_APIDEF int sv_contains(StringView s, StringView pattern); // 1 if yes, 0 if no
 
 #define sv_trim_matches(sv, matches) sv_trim_end_matches(sv_trim_start_matches((sv), (matches)).right, (matches)).left
 _COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_start_matches(StringView sv, int (*matches)(int));
@@ -866,6 +868,24 @@ _COLLECTIONS_STRING_VIEW_APIDEF int sv_ncmp(StringView a, StringView b, _COLLECT
     return diff;
 }
 
+_COLLECTIONS_STRING_VIEW_APIDEF int sv_starts_with(StringView s, StringView prefix) {
+    if (prefix.len > s.len) return 0;
+    for (_COLLECTIONS_STRING_VIEW_SIZE_T i = 0; i < prefix.len; i++) {
+        if (s.data[i] != prefix.data[i]) return 0;
+    }
+    return 1;
+}
+
+_COLLECTIONS_STRING_VIEW_APIDEF int sv_contains(StringView s, StringView pattern) {
+    if (pattern.len > s.len) return 0;
+    if (pattern.len == 0) return 1; // i guess?
+
+    for (_COLLECTIONS_STRING_VIEW_SIZE_T i = 0; i <= (s.len - pattern.len); i++) {
+        if (sv_starts_with(sv_chop(s, i), pattern)) return 1;
+    }
+    return 0;
+    
+}
 _COLLECTIONS_STRING_VIEW_APIDEF StringViewPair sv_trim_start_matches(StringView sv, int (*matches)(int)) {
     if (sv.len == 0) return (StringViewPair) { .l = sv, .r = sv };
     _COLLECTIONS_STRING_VIEW_SIZE_T i = 0;
